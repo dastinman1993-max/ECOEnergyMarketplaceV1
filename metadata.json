@@ -1,0 +1,6 @@
+{
+  "name": "EcoMessenger Marketplace",
+  "description": "Telegram Mini App вітрина екологічних товарів з існуючої бази Supabase та форма оформлення замовлення",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
