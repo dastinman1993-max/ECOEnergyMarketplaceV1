@@ -79,9 +79,12 @@ export default function CartSidebar({
     let telegram_username = 'guest_buyer';
 
     const tg = (window as any).Telegram?.WebApp;
-    if (tg?.initDataUnsafe?.user) {
-      telegram_id = tg.initDataUnsafe.user.id;
-      telegram_username = tg.initDataUnsafe.user.username || 'buyer';
+    const tgUser = tg?.initDataUnsafe?.user;
+    if (tgUser) {
+      telegram_id = tgUser.id || 999999;
+      telegram_username = tgUser.username
+        || `${tgUser.first_name || ''}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`.trim()
+        || 'Покупець';
     }
 
     try {
@@ -114,6 +117,7 @@ export default function CartSidebar({
           },
           comment: comment,
           total_uah: sellerTotal,
+          debug_user: JSON.stringify(tgUser),
         };
 
         if (tg) {
