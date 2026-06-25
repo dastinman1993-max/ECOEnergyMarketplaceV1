@@ -390,12 +390,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Telegram simulation badge */}
-      {telegramUser.isMock && (
-        <div id="telegram-mock-indicator" className="bg-[#4A7C59]/10 border-b border-[#4A7C59]/20 py-1 px-4 text-center text-[10px] text-[#4A7C59] font-mono font-medium shrink-0">
-          🔍 Web Preview: Авторизовано через Еко-Покупця — ID: {telegramUser.id} (@{telegramUser.username})
-        </div>
-      )}
+
 
       {/* Main App Bar / Navigation */}
       <header id="main-navigation-bar" className="sticky top-0 z-40 bg-gradient-to-r from-[#E3DCD0] via-white via-50% to-[#E3DCD0] border-b border-[#E8DFD0] shadow-xs">
