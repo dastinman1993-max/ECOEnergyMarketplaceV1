@@ -219,7 +219,7 @@ export default function CartSidebar({
               <button
                 id="clear-cart-items-btn"
                 onClick={onClearCart}
-                className="text-[10px] text-red-500 hover:text-red-700 font-bold transition-colors"
+                className="text-xs bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-800 border border-red-200 hover:border-red-300 font-bold px-3 py-1.5 rounded-lg transition-all shadow-xs cursor-pointer"
               >
                 Очистити кошик
               </button>
