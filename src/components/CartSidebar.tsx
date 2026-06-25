@@ -97,8 +97,6 @@ export default function CartSidebar({
 
         const orderPayload = {
           buyer: {
-            telegram_id,
-            telegram_username,
             name: recipientName,
             phone,
           },
@@ -117,7 +115,6 @@ export default function CartSidebar({
           },
           comment: comment,
           total_uah: sellerTotal,
-          debug_user: JSON.stringify(tgUser),
         };
 
         if (tg) {

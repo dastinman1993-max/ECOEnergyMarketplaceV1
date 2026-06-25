@@ -402,7 +402,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2">
+          <a href="#" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-[#4A7C59] flex items-center justify-center text-white shadow-xs">
               <Leaf className="w-4 h-4" />
             </div>
@@ -416,38 +416,27 @@ export default function App() {
             </div>
           </a>
 
-          {/* Actions & Basket floating badge */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="flex items-center gap-1.5 bg-[#E8DFD0]/30 border border-[#E8DFD0]/60 px-2.5 py-1 rounded-xl text-[10px] sm:text-xs text-[#2D2D2D]/80 shrink-0 font-bold select-none mr-1">
-              <button
-                id="header-terms-btn"
-                onClick={() => setIsTermsOpen(true)}
-                className="hover:text-[#4A7C59] transition-colors cursor-pointer"
-              >
-                Умови
-              </button>
-              <span className="text-[#4A7C59]/30 font-light">|</span>
-              <button
-                id="header-privacy-btn"
-                onClick={() => setIsPrivacyOpen(true)}
-                className="hover:text-[#4A7C59] transition-colors cursor-pointer"
-              >
-                Конфіденційність
-              </button>
-            </div>
-
+          {/* Terms & Privacy Widget (Centered) */}
+          <div className="flex items-center gap-1.5 bg-[#E8DFD0]/30 border border-[#E8DFD0]/60 px-2.5 py-1 rounded-xl text-[10px] sm:text-xs text-[#2D2D2D]/80 shrink-0 font-bold select-none mx-auto sm:mx-0">
             <button
-              id="add-item-cta-btn"
-              onClick={handleAddProductClick}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#4A7C59] hover:bg-[#3d664a] text-white text-[11px] sm:text-xs font-bold rounded-xl transition-all shadow-xs hover:shadow-md cursor-pointer"
-              title="Напишіть нам щоб додати свій товар або послугу"
+              id="header-terms-btn"
+              onClick={() => setIsTermsOpen(true)}
+              className="hover:text-[#4A7C59] transition-colors cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span className="hidden lg:inline">Напишіть нам щоб додати свій товар або послугу</span>
-              <span className="hidden sm:inline lg:hidden">Додати товар або послугу</span>
-              <span className="sm:hidden">Додати</span>
+              Умови
             </button>
+            <span className="text-[#4A7C59]/30 font-light">|</span>
+            <button
+              id="header-privacy-btn"
+              onClick={() => setIsPrivacyOpen(true)}
+              className="hover:text-[#4A7C59] transition-colors cursor-pointer"
+            >
+              Конфіденційність
+            </button>
+          </div>
 
+          {/* Actions & Basket floating badge */}
+          <div className="flex items-center shrink-0">
             <button
               id="header-cart-toggle"
               onClick={() => setIsCartOpen(true)}
@@ -781,6 +770,19 @@ export default function App() {
                   )}
                 </>
               )}
+
+              {/* Add Product CTA Button below cards */}
+              <div className="mt-12 flex justify-center pb-6">
+                <button
+                  id="add-item-cta-btn"
+                  onClick={handleAddProductClick}
+                  className="inline-flex items-center gap-2 px-6 py-4 bg-[#4A7C59] hover:bg-[#3d664a] text-white text-xs sm:text-sm font-bold rounded-2xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] cursor-pointer max-w-md text-center justify-center w-full"
+                  title="Щоб додати свій товар або послугу напишіть нам"
+                >
+                  <Plus className="w-4 h-4 shrink-0" />
+                  <span>Щоб додати свій товар або послугу напишіть нам</span>
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
