@@ -116,27 +116,16 @@ export default function CartSidebar({
           total_uah: sellerTotal,
         };
 
-        // Real fetch invocation to our backend API route
-        const response = await fetch('https://zoophpkniutlmanifvww.supabase.co/functions/v1/send-order', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify(orderPayload),
-        });
-
-        if (response.ok) {
-          const jsonResponse = await response.json();
+        if (tg) {
+          tg.sendData(JSON.stringify(orderPayload));
           results.push({
             success: true,
-            message: jsonResponse.message || `Замовлення надіслано до @${sellerUsername}`,
-            orderId: jsonResponse.orderId || 'ord-unassigned',
+            message: `Замовлення надіслано до @${sellerUsername}`,
+            orderId: crypto.randomUUID(),
             sellerUsername,
           });
         } else {
-          throw new Error(`Помилка надсилання для продавця @${sellerUsername}`);
+          throw new Error('Telegram WebApp недоступний');
         }
       }
 
