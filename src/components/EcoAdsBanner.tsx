@@ -62,17 +62,14 @@ export default function EcoAdsBanner({ telegramLinks: initialTelegramLinks }: Ec
   }
 
   return (
-    <div id="eco-ads-container" className="w-full px-4 pt-3 pb-1 bg-[#FAF9F6]">
+    <div id="eco-ads-container" className="w-full px-4 pt-1.5 pb-0.5 bg-[#FAF9F6]">
       {/* 
         Beautifully highlighted advertisement box ("СВІЖА ПРОПОЗИЦІЯ")
         Featuring a bright, highly noticeable border, soft light background, and refined layout.
       */}
-      <div className="max-w-7xl mx-auto border-2 border-amber-500 rounded-xl bg-white p-3 md:p-4 shadow-sm relative overflow-hidden">
-        {/* Left bright indicator strip for visual focus */}
-        <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
-        
+      <div className="max-w-7xl mx-auto border-2 border-amber-500 rounded-xl bg-white p-1.5 sm:p-2 shadow-sm relative overflow-hidden">
         {/* Header bar */}
-        <div className="flex items-center gap-2 mb-2 border-b border-amber-100 pb-1.5">
+        <div className="flex items-center justify-center gap-2 mb-1.5 border-b border-amber-200 pb-1">
           <div className="p-1 px-2 h-5 rounded bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
             <Sparkles className="w-3 h-3 text-yellow-300 animate-pulse mr-1" />
             <span className="text-[10px] uppercase font-sans tracking-wide font-extrabold text-white">СВІЖА ПРОПОЗИЦІЯ</span>
@@ -80,7 +77,7 @@ export default function EcoAdsBanner({ telegramLinks: initialTelegramLinks }: Ec
         </div>
 
         {/* Advertisements list */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap gap-1.5 items-center justify-center">
           {ads.map((ad, idx) => {
             // 1. Try to get username from ad.authorNickname
             let username = ad.authorNickname ? ad.authorNickname.replace(/^@/, '').trim() : '';
@@ -104,36 +101,21 @@ export default function EcoAdsBanner({ telegramLinks: initialTelegramLinks }: Ec
               ? `@${username}` 
               : `промо (${ad.advertiser.slice(0, 6)}...${ad.advertiser.slice(-4)})`;
 
-            const buttonLabel = username
-              ? `Зв'язатися @${username}`
-              : `Зв'язатися через бота`;
-
             return (
-              <div 
+              <a 
                 key={`${ad.advertiser}-${idx}`} 
                 id={`ad-row-${idx}`}
-                className="relative bg-amber-50/20 hover:bg-amber-50/40 border border-amber-100 rounded-lg p-2 md:p-3.5 transition-colors flex flex-col justify-between gap-2"
+                href={contactUrl}
+                target="_blank"
+                referrerPolicy="no-referrer"
+                className="inline-flex items-center gap-1.5 border-2 border-amber-600 bg-amber-50/40 hover:bg-amber-100/60 rounded-lg px-2 py-1 text-xs text-[#2D2D2D] hover:text-[#111111] transition-all cursor-pointer shadow-xs active:scale-[0.98] w-fit max-w-full"
               >
-                {/* Ad Content */}
-                <div className="text-xs md:text-[13px] text-[#2D2D2D] leading-relaxed pr-1 flex-1">
-                  <span className="font-extrabold text-[#4A7C59] mr-1">{displayLabel}:</span>
-                  <span className="break-words font-medium">{ad.text}</span>
+                <div className="flex items-center flex-wrap gap-1 leading-tight">
+                  <span className="font-extrabold text-[#4A7C59] whitespace-nowrap">{displayLabel}:</span>
+                  <span className="break-words font-semibold">{ad.text}</span>
+                  <ExternalLink className="w-3 h-3 text-amber-700 shrink-0 ml-0.5 inline-block" />
                 </div>
-
-                {/* Contact button inside the frame, aligned at the bottom right */}
-                <div className="flex justify-end items-center shrink-0">
-                  <a
-                    id={`ad-contact-btn-${idx}`}
-                    href={contactUrl}
-                    target="_blank"
-                    referrerPolicy="no-referrer"
-                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-md shadow-xs hover:shadow-xs transition-all"
-                  >
-                    <span>{buttonLabel}</span>
-                    <ExternalLink className="w-2.5 h-2.5 text-white/90 ml-0.5" />
-                  </a>
-                </div>
-              </div>
+              </a>
             );
           })}
         </div>
