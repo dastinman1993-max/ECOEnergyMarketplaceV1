@@ -67,11 +67,11 @@ export default function EcoAdsBanner({ telegramLinks: initialTelegramLinks }: Ec
         Beautifully highlighted advertisement box ("СВІЖА ПРОПОЗИЦІЯ")
         Featuring a bright, highly noticeable border, soft light background, and refined layout.
       */}
-      <div className="max-w-7xl mx-auto border-2 border-amber-500 rounded-xl bg-white p-1.5 sm:p-2 shadow-sm relative overflow-hidden">
+      <div className="max-w-7xl mx-auto border-2 border-[#4A7C59] rounded-xl bg-gradient-to-r from-[#FAF9F6] via-[#DFD0BC] to-[#FAF9F6] p-1.5 sm:p-2 shadow-sm relative overflow-hidden">
         {/* Header bar */}
-        <div className="flex items-center justify-center gap-2 mb-1.5 border-b border-amber-200 pb-1">
-          <div className="p-1 px-2 h-5 rounded bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <Sparkles className="w-3 h-3 text-yellow-300 animate-pulse mr-1" />
+        <div className="flex items-center justify-center gap-2 mb-1.5 border-b border-[#4A7C59]/30 pb-1">
+          <div className="p-1 px-2 h-5 rounded bg-[#4A7C59] text-white flex items-center justify-center shrink-0 shadow-xs">
+            <Sparkles className="w-3 h-3 text-emerald-200 animate-pulse mr-1" />
             <span className="text-[10px] uppercase font-sans tracking-wide font-extrabold text-white">СВІЖА ПРОПОЗИЦІЯ</span>
           </div>
         </div>
@@ -108,12 +108,12 @@ export default function EcoAdsBanner({ telegramLinks: initialTelegramLinks }: Ec
                 href={contactUrl}
                 target="_blank"
                 referrerPolicy="no-referrer"
-                className="inline-flex items-center gap-1.5 border-2 border-amber-600 bg-amber-50/40 hover:bg-amber-100/60 rounded-lg px-2 py-1 text-xs text-[#2D2D2D] hover:text-[#111111] transition-all cursor-pointer shadow-xs active:scale-[0.98] w-fit max-w-full"
+                className="inline-flex items-center gap-1.5 border-2 border-[#4A7C59] bg-white hover:bg-emerald-50 rounded-lg px-2 py-1 text-xs text-[#2D2D2D] hover:text-[#111111] transition-all cursor-pointer shadow-xs active:scale-[0.98] w-fit max-w-full"
               >
                 <div className="flex items-center flex-wrap gap-1 leading-tight">
                   <span className="font-extrabold text-[#4A7C59] whitespace-nowrap">{displayLabel}:</span>
                   <span className="break-words font-semibold">{ad.text}</span>
-                  <ExternalLink className="w-3 h-3 text-amber-700 shrink-0 ml-0.5 inline-block" />
+                  <ExternalLink className="w-3 h-3 text-[#4A7C59] shrink-0 ml-0.5 inline-block" />
                 </div>
               </a>
             );
