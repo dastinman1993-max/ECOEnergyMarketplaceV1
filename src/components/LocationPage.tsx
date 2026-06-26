@@ -243,7 +243,7 @@ export default function LocationPage({
           </p>
 
           {/* Link copied field */}
-          <div className="w-full flex gap-2">
+          <div className="w-full flex flex-col gap-2">
             <button
               id="copy-location-link"
               onClick={copyToClipboard}
@@ -265,6 +265,14 @@ export default function LocationPage({
                 </>
               )}
             </button>
+            <a
+              href="https://t.me/EcoEnergyMarketplace_bot/ecoenergy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#229ED9] hover:bg-[#1a8bbf] text-white transition-all shadow-xs"
+            >
+              ✈️ Відкрити в Telegram
+            </a>
           </div>
         </div>
       </div>
