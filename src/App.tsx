@@ -667,8 +667,8 @@ export default function App() {
                           className="flex items-center gap-1.5 px-3 py-1.5 bg-[#4A7C59] hover:bg-[#3d664a] text-white text-[11px] font-bold rounded-lg shadow-sm hover:shadow-md hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer"
                           title={`Показати QR-код для району ${selectedDist.name_uk}`}
                         >
-                          <QrCode className="w-3.5 h-3.5" />
-                          <span>Відкрити QR-код: {selectedDist.name_uk} 🗺️</span>
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span>Переглянути локації</span>
                         </button>
                       ) : (
                         <span className="text-[10px] text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
