@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeft, Share2, Check, Clipboard } from 'lucide-react';
 import { CatalogItem, Category, Subcategory, Region, District, TelegramLink } from '../types';
@@ -51,6 +51,12 @@ export default function LocationPage({
   onLocationClick,
 }: LocationPageProps) {
   const [copied, setCopied] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 12;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [regionSlug, districtSlug, localitySlug]);
 
   // Find region & district entities
   const region = regions.find((r) => r.slug === regionSlug);
@@ -65,6 +71,9 @@ export default function LocationPage({
   const locationProducts = localitySlug
     ? allLocationProducts.filter((p) => p.address_detail && toSlug(p.address_detail) === localitySlug)
     : allLocationProducts;
+
+  const totalPages = Math.ceil(locationProducts.length / PAGE_SIZE);
+  const paginatedProducts = locationProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   // Get unique address_details (localities) from products in this district
   const uniqueLocalities = Array.from(
@@ -177,26 +186,37 @@ export default function LocationPage({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {locationProducts.map((product) => {
-              const seller = telegramLinks.find(
-                (l) => l.wallet_address.toLowerCase() === product.wallet_address.toLowerCase()
-              );
-              return (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  sellerUsername={seller?.telegram_username || null}
-                  regionName={regionName}
-                  districtName={districtName}
-                  regionSlug={regionSlug}
-                  districtSlug={districtSlug}
-                  onAddToCart={onAddToCart}
-                  onLocationClick={onLocationClick}
-                />
-              );
-            })}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+              {paginatedProducts.map((product) => {
+                const seller = telegramLinks.find(
+                  (l) => l.wallet_address.toLowerCase() === product.wallet_address.toLowerCase()
+                );
+                return (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    sellerUsername={seller?.telegram_username || null}
+                    regionName={regionName}
+                    districtName={districtName}
+                    regionSlug={regionSlug}
+                    districtSlug={districtSlug}
+                    onAddToCart={onAddToCart}
+                    onLocationClick={onLocationClick}
+                  />
+                );
+              })}
+            </div>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}
+                  className="px-3 py-1.5 rounded-lg border border-[#E8DFD0] text-xs font-bold disabled:opacity-40 bg-white">← Назад</button>
+                <span className="text-xs text-[#2D2D2D]/60">{currentPage} / {totalPages}</span>
+                <button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 rounded-lg border border-[#E8DFD0] text-xs font-bold disabled:opacity-40 bg-white">Далі →</button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
