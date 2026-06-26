@@ -58,6 +58,14 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'newest' | 'price_asc' | 'price_desc' | 'seller'>('newest');
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
+
+  // Reset pagination to first page when filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterCategory, filterSubcategory, filterRegion, filterDistrict, searchQuery, sortBy]);
+
   // Pre-interaction state (now always true so full catalog filters immediately)
   const [hasInteracted, setHasInteracted] = useState(true);
 
@@ -288,7 +296,7 @@ export default function App() {
   };
 
   // Calculate displayed catalog items
-  const getVisibleProducts = (): CatalogItem[] => {
+  const getVisibleProducts = (): { items: CatalogItem[]; totalPages: number; total: number } => {
     let items = [...allProducts];
 
     // Filter active items of verified sellers only inside Supabase module,
@@ -304,63 +312,66 @@ export default function App() {
     if (!hasInteracted && advertiserAddresses.length > 0 && hasAdvertisersInCatalog) {
       items = items.filter((item) => advertiserAddresses.includes(item.wallet_address.toLowerCase()));
       // Sort by creation date DESC
-      return items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    }
-
-    // Stage 2: User-interacted catalog filtering
-    // Text query (now triggers on 1+ characters for instant feedback and checks both name and description)
-    if (searchQuery.trim().length >= 1) {
-      const q = searchQuery.toLowerCase().trim();
-      items = items.filter((item) => 
-        item.name.toLowerCase().includes(q) || 
-        (item.description && item.description.toLowerCase().includes(q))
-      );
-    }
-
-    // Category
-    if (filterCategory !== 'all') {
-      items = items.filter((item) => item.category_id?.toString() === filterCategory.toString());
-    }
-
-    // Subcategory
-    if (filterSubcategory !== 'all') {
-      items = items.filter((item) => item.subcategory_id?.toString() === filterSubcategory.toString());
-    }
-
-    // Region
-    if (filterRegion !== 'all') {
-      items = items.filter((item) => item.region_id?.toString() === filterRegion.toString());
-    }
-
-    // District
-    if (filterDistrict !== 'all') {
-      items = items.filter((item) => item.district_id?.toString() === filterDistrict.toString());
-    }
-
-    // Sort processing
-    if (sortBy === 'newest') {
       items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    } else if (sortBy === 'price_asc') {
-      items.sort((a, b) => a.price_uah - b.price_uah);
-    } else if (sortBy === 'price_desc') {
-      items.sort((a, b) => b.price_uah - a.price_uah);
-    } else if (sortBy === 'seller') {
-      const sellerNicknames: Record<string, string> = {};
-      telegramLinks.forEach((link) => {
-        if (link.wallet_address) {
-          const username = link.telegram_username || '';
-          sellerNicknames[link.wallet_address.toLowerCase()] = username;
-          sellerNicknames[link.wallet_address] = username;
-        }
-      });
-      items.sort((a, b) => {
-        const nickA = sellerNicknames[a.wallet_address.toLowerCase()] || sellerNicknames[a.wallet_address] || a.wallet_address;
-        const nickB = sellerNicknames[b.wallet_address.toLowerCase()] || sellerNicknames[b.wallet_address] || b.wallet_address;
-        return nickA.localeCompare(nickB, 'uk');
-      });
+    } else {
+      // Stage 2: User-interacted catalog filtering
+      // Text query (now triggers on 1+ characters for instant feedback and checks both name and description)
+      if (searchQuery.trim().length >= 1) {
+        const q = searchQuery.toLowerCase().trim();
+        items = items.filter((item) => 
+          item.name.toLowerCase().includes(q) || 
+          (item.description && item.description.toLowerCase().includes(q))
+        );
+      }
+
+      // Category
+      if (filterCategory !== 'all') {
+        items = items.filter((item) => item.category_id?.toString() === filterCategory.toString());
+      }
+
+      // Subcategory
+      if (filterSubcategory !== 'all') {
+        items = items.filter((item) => item.subcategory_id?.toString() === filterSubcategory.toString());
+      }
+
+      // Region
+      if (filterRegion !== 'all') {
+        items = items.filter((item) => item.region_id?.toString() === filterRegion.toString());
+      }
+
+      // District
+      if (filterDistrict !== 'all') {
+        items = items.filter((item) => item.district_id?.toString() === filterDistrict.toString());
+      }
+
+      // Sort processing
+      if (sortBy === 'newest') {
+        items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      } else if (sortBy === 'price_asc') {
+        items.sort((a, b) => a.price_uah - b.price_uah);
+      } else if (sortBy === 'price_desc') {
+        items.sort((a, b) => b.price_uah - a.price_uah);
+      } else if (sortBy === 'seller') {
+        const sellerNicknames: Record<string, string> = {};
+        telegramLinks.forEach((link) => {
+          if (link.wallet_address) {
+            const username = link.telegram_username || '';
+            sellerNicknames[link.wallet_address.toLowerCase()] = username;
+            sellerNicknames[link.wallet_address] = username;
+          }
+        });
+        items.sort((a, b) => {
+          const nickA = sellerNicknames[a.wallet_address.toLowerCase()] || sellerNicknames[a.wallet_address] || a.wallet_address;
+          const nickB = sellerNicknames[b.wallet_address.toLowerCase()] || sellerNicknames[b.wallet_address] || b.wallet_address;
+          return nickA.localeCompare(nickB, 'uk');
+        });
+      }
     }
 
-    return items;
+    const result = items;
+    const totalPages = Math.ceil(result.length / PAGE_SIZE);
+    const paginated = result.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+    return { items: paginated, totalPages, total: result.length };
   };
 
   const handleAddProductClick = () => {
@@ -373,7 +384,10 @@ export default function App() {
     }
   };
 
-  const displayedProducts = getVisibleProducts();
+  const visibleProductsData = getVisibleProducts();
+  const displayedProducts = visibleProductsData.items;
+  const totalPages = visibleProductsData.totalPages;
+  const total = visibleProductsData.total;
   const selectedReg = filterRegion !== 'all' ? regions.find(r => r.id?.toString() === filterRegion?.toString()) : undefined;
   const selectedDist = filterDistrict !== 'all' ? districts.find(d => d.id?.toString() === filterDistrict?.toString()) : undefined;
 
@@ -658,7 +672,7 @@ export default function App() {
                         </button>
                       ) : (
                         <span className="text-[10px] text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
-                          📍 Оберіть область та район, щоб отримати QR-код
+                          📍 Оберіть область та район щоб знайти локальних виробників
                         </span>
                       )}
                     </div>
@@ -734,34 +748,46 @@ export default function App() {
                       </button>
                     </div>
                   ) : (
-                    <div id="catalog-products-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {displayedProducts.map((product) => {
-                        // Find matching telegram link seller details
-                        const sellerLink = telegramLinks.find(
-                          (link) => link.wallet_address.toLowerCase() === product.wallet_address.toLowerCase()
-                        );
-                        
-                        // Lookup Category/Region/District names
-                        const rName = regions.find((r) => r.id === product.region_id)?.name_uk || 'Область';
-                        const dName = districts.find((d) => d.id === product.district_id)?.name_uk || 'Район';
-                        const rSlug = regions.find((r) => r.id === product.region_id)?.slug || 'not-found';
-                        const dSlug = districts.find((d) => d.id === product.district_id)?.slug || 'not-found';
+                    <>
+                      <div id="catalog-products-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {displayedProducts.map((product) => {
+                          // Find matching telegram link seller details
+                          const sellerLink = telegramLinks.find(
+                            (link) => link.wallet_address.toLowerCase() === product.wallet_address.toLowerCase()
+                          );
+                          
+                          // Lookup Category/Region/District names
+                          const rName = regions.find((r) => r.id === product.region_id)?.name_uk || 'Область';
+                          const dName = districts.find((d) => d.id === product.district_id)?.name_uk || 'Район';
+                          const rSlug = regions.find((r) => r.id === product.region_id)?.slug || 'not-found';
+                          const dSlug = districts.find((d) => d.id === product.district_id)?.slug || 'not-found';
 
-                        return (
-                          <ProductCard
-                            key={product.id}
-                            product={product}
-                            sellerUsername={sellerLink?.telegram_username || null}
-                            regionName={rName}
-                            districtName={dName}
-                            regionSlug={rSlug}
-                            districtSlug={dSlug}
-                            onAddToCart={handleAddToCart}
-                            onLocationClick={navigateToLocation}
-                          />
-                        );
-                      })}
-                    </div>
+                          return (
+                            <ProductCard
+                              key={product.id}
+                              product={product}
+                              sellerUsername={sellerLink?.telegram_username || null}
+                              regionName={rName}
+                              districtName={dName}
+                              regionSlug={rSlug}
+                              districtSlug={dSlug}
+                              onAddToCart={handleAddToCart}
+                              onLocationClick={navigateToLocation}
+                            />
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex items-center justify-center gap-2 mt-6">
+                        <button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}
+                          className="px-3 py-1.5 rounded-lg border border-[#E8DFD0] text-xs font-bold disabled:opacity-40">← Назад</button>
+                        <span className="text-xs text-[#2D2D2D]/60">
+                          {currentPage} / {totalPages}  ({total} товарів)
+                        </span>
+                        <button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}
+                          className="px-3 py-1.5 rounded-lg border border-[#E8DFD0] text-xs font-bold disabled:opacity-40">Далі →</button>
+                      </div>
+                    </>
                   )}
                 </>
               )}

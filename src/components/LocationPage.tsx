@@ -107,12 +107,104 @@ export default function LocationPage({
         <span>Повернутись до каталогу</span>
       </button>
 
-      {/* Main Grid: Info card and catalog list */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* QR & Location Info Block */}
+      {/* Main Container: Catalog list taking full width */}
+      <div className="flex flex-col gap-6">
+        {/* Localities block if localitySlug is not passed */}
+        {!localitySlug && uniqueLocalities.length > 0 && (
+          <div className="bg-white rounded-2xl border border-[#E8DFD0] p-5 shadow-xs">
+            <h4 className="font-sans font-bold text-sm text-[#2D2D2D] flex items-center gap-2 mb-2">
+              <span className="text-base">🏘️</span>
+              <span>Населені пункти ({uniqueLocalities.length})</span>
+            </h4>
+            <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+              Оберіть населений пункт, щоб переглянути локальні товари та отримати точний QR-код:
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
+              {uniqueLocalities.map((locality) => {
+                const slug = toSlug(locality);
+                return (
+                  <button
+                    key={locality}
+                    onClick={() => {
+                      window.location.hash = `location/${regionSlug}/${districtSlug}/${slug}`;
+                    }}
+                    className="px-3.5 py-2.5 bg-[#F7F5F0] hover:bg-[#4A7C59]/10 text-[#2D2D2D] hover:text-[#4A7C59] border border-[#E8DFD0] hover:border-[#4A7C59]/30 rounded-xl text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer text-left flex items-center gap-2"
+                  >
+                    <span>📍</span>
+                    <span className="truncate">{locality}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-[#E8DFD0]/60">
+          <div>
+            <h3 className="font-sans font-semibold text-[#2D2D2D] text-sm">
+              {selectedLocalityName ? (
+                <span className="flex items-center gap-1.5 flex-wrap">
+                  <span>Товари в:</span>
+                  <span className="text-[#4A7C59] font-bold">{selectedLocalityName}</span>
+                  <span className="text-gray-300">•</span>
+                  <button
+                    onClick={() => {
+                      window.location.hash = `location/${regionSlug}/${districtSlug}`;
+                    }}
+                    className="text-xs text-[#4A7C59] hover:underline cursor-pointer"
+                  >
+                    весь {districtName}
+                  </button>
+                </span>
+              ) : (
+                `Товари в локації: ${districtName}`
+              )}
+            </h3>
+            <p className="text-xs text-[#2D2D2D]/50 mt-0.5">
+              Знайдено: {locationProducts.length} товар{locationProducts.length === 1 ? 'ь' : locationProducts.length >= 2 && locationProducts.length <= 4 ? 'і' : 'ів'}
+            </p>
+          </div>
+          <div className="text-[11px] bg-[#E8DFD0] px-2.5 py-1 text-[#2D2D2D]/80 rounded-md font-medium">
+            Крафтовий сертифікат
+          </div>
+        </div>
+
+        {locationProducts.length === 0 ? (
+          <div className="bg-[#F7F5F0] rounded-2xl border-2 border-dashed border-[#E8DFD0] p-12 text-center">
+            <span className="text-[#2D2D2D]/40 text-sm block mb-2">Наразі немає активних товарів</span>
+            <p className="text-xs text-[#2D2D2D]/40 max-w-md mx-auto">
+              Будь ласка, зазирніть пізніше! Ви можете стати першим продавцем цієї локації, зареєструвавши свій гаманець в системі.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {locationProducts.map((product) => {
+              const seller = telegramLinks.find(
+                (l) => l.wallet_address.toLowerCase() === product.wallet_address.toLowerCase()
+              );
+              return (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  sellerUsername={seller?.telegram_username || null}
+                  regionName={regionName}
+                  districtName={districtName}
+                  regionSlug={regionSlug}
+                  districtSlug={districtSlug}
+                  onAddToCart={onAddToCart}
+                  onLocationClick={onLocationClick}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* QR & Location Info Block at the very bottom */}
+      <div className="mt-12 border-t border-[#E8DFD0] pt-12 flex justify-center">
         <div 
           id="location-info-panel"
-          className="lg:col-span-4 bg-white rounded-2xl border border-[#E8DFD0] p-6 shadow-sm flex flex-col items-center text-center"
+          className="w-full max-w-xl bg-white rounded-2xl border border-[#E8DFD0] p-8 shadow-sm flex flex-col items-center text-center"
         >
           <div className="p-3 bg-white border border-[#E8DFD0] rounded-2xl mb-4 shadow-xs">
             <QRCodeSVG
@@ -174,99 +266,6 @@ export default function LocationPage({
               )}
             </button>
           </div>
-        </div>
-
-        {/* Dynamic products list */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          {/* Localities block if localitySlug is not passed */}
-          {!localitySlug && uniqueLocalities.length > 0 && (
-            <div className="bg-white rounded-2xl border border-[#E8DFD0] p-5 shadow-xs">
-              <h4 className="font-sans font-bold text-sm text-[#2D2D2D] flex items-center gap-2 mb-2">
-                <span className="text-base">🏘️</span>
-                <span>Населені пункти ({uniqueLocalities.length})</span>
-              </h4>
-              <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-                Оберіть населений пункт, щоб переглянути локальні товари та отримати точний QR-код:
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                {uniqueLocalities.map((locality) => {
-                  const slug = toSlug(locality);
-                  return (
-                    <button
-                      key={locality}
-                      onClick={() => {
-                        window.location.hash = `location/${regionSlug}/${districtSlug}/${slug}`;
-                      }}
-                      className="px-3.5 py-2.5 bg-[#F7F5F0] hover:bg-[#4A7C59]/10 text-[#2D2D2D] hover:text-[#4A7C59] border border-[#E8DFD0] hover:border-[#4A7C59]/30 rounded-xl text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer text-left flex items-center gap-2"
-                    >
-                      <span>📍</span>
-                      <span className="truncate">{locality}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-[#E8DFD0]/60">
-            <div>
-              <h3 className="font-sans font-semibold text-[#2D2D2D] text-sm">
-                {selectedLocalityName ? (
-                  <span className="flex items-center gap-1.5 flex-wrap">
-                    <span>Товари в:</span>
-                    <span className="text-[#4A7C59] font-bold">{selectedLocalityName}</span>
-                    <span className="text-gray-300">•</span>
-                    <button
-                      onClick={() => {
-                        window.location.hash = `location/${regionSlug}/${districtSlug}`;
-                      }}
-                      className="text-xs text-[#4A7C59] hover:underline cursor-pointer"
-                    >
-                      весь {districtName}
-                    </button>
-                  </span>
-                ) : (
-                  `Товари в локації: ${districtName}`
-                )}
-              </h3>
-              <p className="text-xs text-[#2D2D2D]/50 mt-0.5">
-                Знайдено: {locationProducts.length} товар{locationProducts.length === 1 ? 'ь' : locationProducts.length >= 2 && locationProducts.length <= 4 ? 'і' : 'ів'}
-              </p>
-            </div>
-            <div className="text-[11px] bg-[#E8DFD0] px-2.5 py-1 text-[#2D2D2D]/80 rounded-md font-medium">
-              Крафтовий сертифікат
-            </div>
-          </div>
-
-          {locationProducts.length === 0 ? (
-            <div className="bg-[#F7F5F0] rounded-2xl border-2 border-dashed border-[#E8DFD0] p-12 text-center">
-              <span className="text-[#2D2D2D]/40 text-sm block mb-2">Наразі немає активних товарів</span>
-              <p className="text-xs text-[#2D2D2D]/40 max-w-md mx-auto">
-                Будь ласка, зазирніть пізніше! Ви можете стати першим продавцем цієї локації, зареєструвавши свій гаманець в системі.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {locationProducts.map((product) => {
-                const seller = telegramLinks.find(
-                  (l) => l.wallet_address.toLowerCase() === product.wallet_address.toLowerCase()
-                );
-                return (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    sellerUsername={seller?.telegram_username || null}
-                    regionName={regionName}
-                    districtName={districtName}
-                    regionSlug={regionSlug}
-                    districtSlug={districtSlug}
-                    onAddToCart={onAddToCart}
-                    onLocationClick={onLocationClick}
-                  />
-                );
-              })}
-            </div>
-          )}
         </div>
       </div>
     </div>
