@@ -206,16 +206,6 @@ export default function LocationPage({
           id="location-info-panel"
           className="w-full max-w-xl bg-white rounded-2xl border border-[#E8DFD0] p-8 shadow-sm flex flex-col items-center text-center"
         >
-          <div className="p-3 bg-white border border-[#E8DFD0] rounded-2xl mb-4 shadow-xs">
-            <QRCodeSVG
-              value={shareUrl}
-              size={140}
-              bgColor="#ffffff"
-              fgColor="#4A7C59"
-              level="M"
-            />
-          </div>
-
           <p className="text-[10px] uppercase font-mono tracking-wider text-gray-400 font-bold mb-1">
             Локальна вітрина
           </p>
