@@ -39,6 +39,8 @@ export default function App() {
   const [currentRoute, setCurrentRoute] = useState<'home' | 'location'>('home');
   const [routeParams, setRouteParams] = useState<{ regionSlug: string; districtSlug: string; localitySlug?: string } | null>(null);
 
+  const initialSubcategoryRef = React.useRef<string | null>(null);
+
   // Core records lists
   const [loading, setLoading] = useState(true);
   const [dbConfigured, setDbConfigured] = useState(true);
@@ -145,22 +147,18 @@ export default function App() {
               isMock: false,
             });
           }
-          // Parse start_param from agent deep links
-          // Format: search-{query}_cat-{id}_reg-{id}_dis-{id}_sub-{id}
+          // Parse start_param from Telegram deep links
+          // Format: cat-{categoryId} and optionally _sub-{subcategoryId}
           const startParam = tg.initDataUnsafe?.start_param;
           if (startParam) {
             const parts = startParam.split('_');
             for (const part of parts) {
-              if (part.startsWith('search-')) {
-                setSearchQuery(decodeURIComponent(part.slice(7).replace(/\+/g, ' ')));
-              } else if (part.startsWith('cat-')) {
+              if (part.startsWith('cat-')) {
                 setFilterCategory(part.slice(4));
-              } else if (part.startsWith('reg-')) {
-                setFilterRegion(part.slice(4));
-              } else if (part.startsWith('dis-')) {
-                setFilterDistrict(part.slice(4));
               } else if (part.startsWith('sub-')) {
-                setFilterSubcategory(part.slice(4));
+                const subId = part.slice(4);
+                initialSubcategoryRef.current = subId;
+                setFilterSubcategory(subId);
               }
             }
           }
@@ -241,7 +239,12 @@ export default function App() {
       const selectedCatId = filterCategory === 'all' ? undefined : filterCategory;
       const filteredSubs = await fetchSubcategories(selectedCatId);
       setSubcategories(filteredSubs);
-      setFilterSubcategory('all'); // Reset subcategory when category changes
+      if (initialSubcategoryRef.current) {
+        setFilterSubcategory(initialSubcategoryRef.current);
+        initialSubcategoryRef.current = null;
+      } else {
+        setFilterSubcategory('all'); // Reset subcategory when category changes
+      }
     }
     loadCascadedSubs();
   }, [filterCategory]);
