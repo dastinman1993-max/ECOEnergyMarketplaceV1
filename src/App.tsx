@@ -145,6 +145,25 @@ export default function App() {
               isMock: false,
             });
           }
+          // Parse start_param from agent deep links
+          // Format: search-{query}_cat-{id}_reg-{id}_dis-{id}_sub-{id}
+          const startParam = tg.initDataUnsafe?.start_param;
+          if (startParam) {
+            const parts = startParam.split('_');
+            for (const part of parts) {
+              if (part.startsWith('search-')) {
+                setSearchQuery(decodeURIComponent(part.slice(7).replace(/\+/g, ' ')));
+              } else if (part.startsWith('cat-')) {
+                setFilterCategory(part.slice(4));
+              } else if (part.startsWith('reg-')) {
+                setFilterRegion(part.slice(4));
+              } else if (part.startsWith('dis-')) {
+                setFilterDistrict(part.slice(4));
+              } else if (part.startsWith('sub-')) {
+                setFilterSubcategory(part.slice(4));
+              }
+            }
+          }
         } catch (e) {
           console.warn('Error inside Telegram WebApp initialization:', e);
         }
