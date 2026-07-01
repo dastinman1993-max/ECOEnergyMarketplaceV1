@@ -17,6 +17,8 @@ import {
   QrCode
 } from 'lucide-react';
 
+import logoImg from './assets/images/eco_logo_final_1782897699183.jpg';
+
 import { CatalogItem, Category, Subcategory, Region, District, TelegramLink, CartItem, Ad } from './types';
 import { 
   fetchCategories, 
@@ -430,13 +432,16 @@ export default function App() {
 
       {/* Main App Bar / Navigation */}
       <header id="main-navigation-bar" className="sticky top-0 z-40 bg-gradient-to-r from-[#E3DCD0] via-white via-50% to-[#E3DCD0] border-b border-[#E8DFD0] shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
           
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-[#4A7C59] flex items-center justify-center text-white shadow-xs">
-              <Leaf className="w-4 h-4" />
-            </div>
+            <img 
+              src={logoImg} 
+              alt="EcoMessenger Logo" 
+              className="w-16 h-16 rounded-full object-cover shadow-md border-2 border-white/80 hover:scale-105 transition-transform" 
+              referrerPolicy="no-referrer" 
+            />
             <div>
               <h1 className="font-sans font-black text-sm tracking-tight text-[#2D2D2D]">
                 EcoMessenger
