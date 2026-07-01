@@ -32,6 +32,7 @@ export default function CartSidebar({
   const [deliveryMethod, setDeliveryMethod] = useState<'nova_poshta' | 'ukrposhta' | 'pickup'>('nova_poshta');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [comment, setComment] = useState('');
+  const [isFormExpanded, setIsFormExpanded] = useState(false);
   
   // Status states
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -184,17 +185,28 @@ export default function CartSidebar({
   return (
     <div id="cart-panel-content" className="flex flex-col h-full bg-[#F7F5F0]">
       {/* Drawer Header */}
-      <div className="p-4 bg-white border-b border-[#E8DFD0] flex justify-between items-center shrink-0">
+      <div className="p-4 bg-white border-b border-[#E8DFD0] flex justify-between items-center gap-2 shrink-0">
         <div className="flex items-center gap-2">
           <ShoppingCart className="w-5 h-5 text-[#4A7C59]" />
-          <h2 className="font-sans font-bold text-sm text-[#2D2D2D]">
+          <h2 className="font-sans font-bold text-sm text-[#2D2D2D] whitespace-nowrap">
             Ваш кошик ({cart.length})
           </h2>
         </div>
+
+        {cart.length > 0 && (
+          <button
+            id="continue-shopping-top-btn"
+            onClick={onClose}
+            className="py-1.5 px-3 bg-amber-400 text-amber-950 font-sans font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-lg border-2 border-amber-500 shadow-sm hover:bg-amber-300 transition-all cursor-pointer text-center ml-auto"
+          >
+            Продовжити покупки
+          </button>
+        )}
+
         <button
           id="close-cart-drawer"
           onClick={onClose}
-          className="p-1 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+          className="p-1 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors shrink-0"
         >
           <X className="w-5 h-5" />
         </button>
@@ -211,7 +223,8 @@ export default function CartSidebar({
           </p>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col md:grid md:grid-cols-12 overflow-hidden h-full">
+        <>
+          <div className="flex-1 flex flex-col md:grid md:grid-cols-12 overflow-hidden h-full">
           {/* Scrollable products section */}
           <div className="md:col-span-7 overflow-y-auto p-4 space-y-4 max-h-[40vh] md:max-h-full">
             <div className="flex justify-between items-center pb-2 border-b border-[#E8DFD0]/60">
@@ -219,7 +232,7 @@ export default function CartSidebar({
               <button
                 id="clear-cart-items-btn"
                 onClick={onClearCart}
-                className="text-xs bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-800 border border-red-200 hover:border-red-300 font-bold px-3 py-1.5 rounded-lg transition-all shadow-xs cursor-pointer"
+                className="text-xs bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-900 border border-red-300 hover:border-red-400 font-bold px-3 py-1.5 rounded-lg transition-all shadow-xs cursor-pointer"
               >
                 Очистити кошик
               </button>
@@ -240,9 +253,10 @@ export default function CartSidebar({
                   className="bg-white rounded-xl border border-[#E8DFD0] overflow-hidden shadow-xs"
                 >
                   {/* Group header */}
-                  <div className="px-4 py-2 bg-[#4A7C59]/10 border-b border-[#E8DFD0] flex justify-between items-center">
-                    <span className="text-xs font-bold text-[#4A7C59]">
-                      @{sellerUser}
+                  <div className="px-4 py-2 bg-[#4A7C59]/5 border-b border-[#E8DFD0] flex justify-between items-center">
+                    <span className="text-xs font-bold text-[#4A7C59] flex items-center gap-1">
+                      <span className="text-[11px] uppercase tracking-wider text-[#2D2D2D]/60 font-medium">Продавець:</span>
+                      <span>@{sellerUser}</span>
                     </span>
                   </div>
 
@@ -314,135 +328,154 @@ export default function CartSidebar({
           </div>
 
           {/* Form & Totals Section */}
-          <div className="md:col-span-5 bg-white border-t md:border-t-0 md:border-l border-[#E8DFD0] p-4 flex flex-col justify-between overflow-y-auto">
-            <form onSubmit={handleSubmitOrder} className="space-y-3.5">
-              <span className="text-[11px] font-mono font-bold text-[#2D2D2D]/60 uppercase tracking-wider block border-b border-gray-100 pb-2">
-                Дані отримувача замовлення
-              </span>
-
-              {/* Input name */}
-              <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
-                  <User className="w-3 h-3 text-[#4A7C59]" />
-                  ПІБ отримувача *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Олександр Коваленко"
-                  value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
-                  className="w-full bg-[#F7F5F0] border border-[#E8DFD0] rounded-xl px-3 py-2 text-xs text-[#2D2D2D] outline-hidden focus:border-[#4A7C59] transition-colors"
-                />
-              </div>
-
-              {/* Input phone */}
-              <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
-                  <Phone className="w-3 h-3 text-[#4A7C59]" />
-                  Контактний телефон *
-                </label>
-                <input
-                  type="tel"
-                  required
-                  placeholder="+380 50 123 4567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-[#F7F5F0] border border-[#E8DFD0] rounded-xl px-3 py-2 text-xs text-[#2D2D2D] outline-hidden focus:border-[#4A7C59] transition-colors"
-                />
-              </div>
-
-              {/* Delivery system options */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
-                  <Truck className="w-3 h-3 text-[#4A7C59]" />
-                  Спосіб доставки *
-                </label>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {(['nova_poshta', 'ukrposhta', 'pickup'] as const).map((method) => {
-                    const label = method === 'nova_poshta' ? 'Нова Пошта' : method === 'ukrposhta' ? 'Укрпошта' : 'Самовивіз';
-                    const active = deliveryMethod === method;
-                    return (
-                      <button
-                        key={method}
-                        type="button"
-                        onClick={() => setDeliveryMethod(method)}
-                        className={`py-1.5 px-1 rounded-lg text-[10px] font-bold text-center border transition-all ${
-                          active
-                            ? 'bg-[#4A7C59]/10 border-[#4A7C59] text-[#4A7C59]'
-                            : 'bg-[#F7F5F0] border-[#E8DFD0] text-gray-600'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Delivery Office/Address Detail */}
-              <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-[#4A7C59]" />
-                  {deliveryMethod === 'pickup' ? 'Адреса отримання / пункт' : 'Адреса доставки / № Відділення *'}
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder={
-                    deliveryMethod === 'nova_poshta'
-                      ? 'м. Львів, Відділення №5'
-                      : deliveryMethod === 'ukrposhta'
-                      ? 'м. Стрий, вул. Франка 12, індекс 82400'
-                      : 'Домовленість по самовивозу'
-                  }
-                  value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  className="w-full bg-[#F7F5F0] border border-[#E8DFD0] rounded-xl px-3 py-2 text-xs text-[#2D2D2D] outline-hidden focus:border-[#4A7C59] transition-colors"
-                />
-              </div>
-
-              {/* Comment field (optional) */}
-              <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
-                  <MessageSquare className="w-3 h-3 text-[#4A7C59]" />
-                  Коментар (необов'язково)
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Ваші побажання щодо пакування, тощо..."
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="w-full bg-[#F7F5F0] border border-[#E8DFD0] rounded-xl px-3 py-1.5 text-xs text-[#2D2D2D] outline-hidden focus:border-[#4A7C59] transition-colors resize-none"
-                />
-              </div>
-
-              {/* Total Summary and checkout actions */}
-              <div className="border-t border-[#E8DFD0] pt-4 mt-6 space-y-3 shrink-0">
-                {formError && (
-                  <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 flex items-start gap-2 text-red-700 text-xs animation-fade">
-                    <AlertCircle className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
-                    <span className="leading-relaxed">{formError}</span>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center">
+          <div className="md:col-span-5 bg-white border-t md:border-t-0 md:border-l border-[#E8DFD0] p-2 flex flex-col overflow-y-auto">
+            <div className="space-y-2">
+              {/* Grand Total & Checkout Toggle Button */}
+              <div className="bg-[#F7F5F0] p-2.5 rounded-xl border border-[#E8DFD0]/80 space-y-2 shrink-0">
+                <div className="flex justify-between items-center px-1">
                   <span className="text-xs font-semibold text-[#2D2D2D]/70">Загальна сума:</span>
                   <span className="text-lg font-black text-[#4A7C59] font-mono">{grandTotal} ₴</span>
                 </div>
 
+                {/* Checkout Toggle Button */}
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 bg-[#4A7C59] hover:bg-[#3d664a] disabled:bg-gray-400 text-white font-bold rounded-xl text-xs shadow-xs hover:shadow-md transition-all active:scale-[0.98]"
+                  type="button"
+                  id="checkout-toggle-btn"
+                  onClick={() => setIsFormExpanded(!isFormExpanded)}
+                  className="w-full py-3.5 px-6 bg-[#E07A5F] hover:bg-[#d46b50] text-white font-sans font-black text-xs uppercase tracking-wider rounded-xl border-2 border-[#c85a3f] shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>{isSubmitting ? 'Надсилаємо замовлення...' : 'Підтвердити замовлення'}</span>
+                  <span>{isFormExpanded ? 'Приховати дані доставки' : 'Оформити замовлення'}</span>
+                  <span className="text-[10px] opacity-80">{isFormExpanded ? '▲' : '▼'}</span>
                 </button>
               </div>
-            </form>
+
+              {/* Recipient Details form, visible only when isFormExpanded is true */}
+              {isFormExpanded && (
+                <form onSubmit={handleSubmitOrder} className="space-y-3.5 border border-[#E8DFD0] p-4 rounded-xl bg-[#F7F5F0]/30 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <span className="text-[11px] font-mono font-bold text-[#2D2D2D]/60 uppercase tracking-wider block border-b border-gray-100 pb-2">
+                    Дані отримувача замовлення
+                  </span>
+
+                  {/* Input name */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
+                      <User className="w-3 h-3 text-[#4A7C59]" />
+                      ПІБ отримувача *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Олександр Коваленко"
+                      value={recipientName}
+                      onChange={(e) => setRecipientName(e.target.value)}
+                      className="w-full bg-white border border-[#E8DFD0] rounded-xl px-3 py-2 text-xs text-[#2D2D2D] outline-hidden focus:border-[#4A7C59] transition-colors"
+                    />
+                  </div>
+
+                  {/* Input phone */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
+                      <Phone className="w-3 h-3 text-[#4A7C59]" />
+                      Контактний телефон *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="+380 50 123 4567"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full bg-white border border-[#E8DFD0] rounded-xl px-3 py-2 text-xs text-[#2D2D2D] outline-hidden focus:border-[#4A7C59] transition-colors"
+                    />
+                  </div>
+
+                  {/* Delivery system options */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
+                      <Truck className="w-3 h-3 text-[#4A7C59]" />
+                      Спосіб доставки *
+                    </label>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {(['nova_poshta', 'ukrposhta', 'pickup'] as const).map((method) => {
+                        const label = method === 'nova_poshta' ? 'Нова Пошта' : method === 'ukrposhta' ? 'Укрпошта' : 'Самовивіз';
+                        const active = deliveryMethod === method;
+                        return (
+                          <button
+                            key={method}
+                            type="button"
+                            onClick={() => setDeliveryMethod(method)}
+                            className={`py-1.5 px-1 rounded-lg text-[10px] font-bold text-center border transition-all ${
+                              active
+                                ? 'bg-[#4A7C59]/10 border-[#4A7C59] text-[#4A7C59]'
+                                : 'bg-white border-[#E8DFD0] text-gray-600'
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Delivery Office/Address Detail */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-[#4A7C59]" />
+                      {deliveryMethod === 'pickup' ? 'Адреса отримання / пункт' : 'Адреса доставки / № Відділення *'}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder={
+                        deliveryMethod === 'nova_poshta'
+                          ? 'м. Львів, Відділення №5'
+                          : deliveryMethod === 'ukrposhta'
+                          ? 'м. Стрий, вул. Франка 12, індекс 82400'
+                          : 'Домовленість по самовивозу'
+                      }
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      className="w-full bg-white border border-[#E8DFD0] rounded-xl px-3 py-2 text-xs text-[#2D2D2D] outline-hidden focus:border-[#4A7C59] transition-colors"
+                    />
+                  </div>
+
+                  {/* Comment field (optional) */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-[#2D2D2D]/80 flex items-center gap-1">
+                      <MessageSquare className="w-3 h-3 text-[#4A7C59]" />
+                      Коментар (необов'язково)
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder="Ваші побажання щодо пакування, тощо..."
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="w-full bg-white border border-[#E8DFD0] rounded-xl px-3 py-1.5 text-xs text-[#2D2D2D] outline-hidden focus:border-[#4A7C59] transition-colors resize-none"
+                    />
+                  </div>
+
+                  {/* Form Submission Actions */}
+                  <div className="border-t border-[#E8DFD0] pt-3.5 mt-4 space-y-3">
+                    {formError && (
+                      <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 flex items-start gap-2 text-red-700 text-xs">
+                        <AlertCircle className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
+                        <span className="leading-relaxed">{formError}</span>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 bg-[#4A7C59] hover:bg-[#3d664a] disabled:bg-gray-400 text-white font-bold rounded-xl text-xs shadow-xs hover:shadow-md transition-all active:scale-[0.98]"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>{isSubmitting ? 'Надсилаємо замовлення...' : 'Підтвердити замовлення'}</span>
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
-        </div>
+        </div></>
       )}
     </div>
   );
